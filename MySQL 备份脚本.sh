@@ -8,7 +8,7 @@ MYSQL_BASE="/usr/bin/mysql -u $USERNAME -p$PASSWORD -h $HOSTIP"
 MYSQLDUMP_BASE="/usr/bin/mysqldump -u $USERNAME -p$PASSWORD -h $HOSTIP"
 
 BACKUP_DATE=$(date +'%Y_%m_%d')
-BASE_DIR="/lianziba/tomcat/backups/sql/$BACKUP_DATE"
+BASE_DIR="/tomcat/backups/sql/$BACKUP_DATE"
 BACKUP_DIR="$BASE_DIR/data"
 BACKUP_DIR_NODATA="$BASE_DIR/nodata"
 
@@ -42,13 +42,13 @@ do
 done
 
 # 压缩数据库文件
-tar -czf /lianziba/tomcat/backups/sql/$BACKUP_DATE.tar.gz /lianziba/tomcat/backups/sql/$BACKUP_DATE
+tar -czf /tomcat/backups/sql/$BACKUP_DATE.tar.gz /tomcat/backups/sql/$BACKUP_DATE
 
 # ftp -n<<!
-# open 10.230.94.140
-# user dns dns!2018
+# open 10.230.94.xx
+# user dns xxxxxxx
 # binary
-# lcd /lianziba/tomcat/backups/sql
+# lcd /tomcat/backups/sql
 # prompt off
 # put $BACKUP_DATE.tar.gz
 # close
