@@ -2,7 +2,7 @@
 
 # MySQL username and password. chmod this script to 0700.
 USERNAME="root"
-PASSWORD="IN#hf8tv"
+PASSWORD="EWDPASS"
 HOSTIP="localhost"
 MYSQL_BASE="/usr/bin/mysql -u $USERNAME -p$PASSWORD -h $HOSTIP"
 MYSQLDUMP_BASE="/usr/bin/mysqldump -u $USERNAME -p$PASSWORD -h $HOSTIP"
