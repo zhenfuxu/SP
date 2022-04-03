@@ -1,0 +1,186 @@
+以下代码参考 https://blog.csdn.net/cxllyg/article/details/7604812迪杰斯特拉算法（可打印最短路径）_cxllyg的博客-CSDN博客_打印最短路径。并且可执行。
+
+package org.test.ok;
+
+import java.io.IOException;
+import java.util.Scanner;
+
+public class TheMain {
+
+    public static void main(String[] args) throws IOException {
+
+        Graphics g = new Graphics();
+        g.initMap();
+        g.defaultSet();
+        g.dijkstra("v0");
+
+    }
+
+    static class Graphics {
+
+        // 点数
+        private int vexnum = 6;
+        // 边数
+        private int arcnum = 8;
+
+        // 默认值不可答边的大小
+        private static int INFINITY = -1;
+        // 顶点信息
+        String[] vexs = {"v0", "v1", "v2", "v3", "v4", "v5"};
+        // 二维数组表示有向图邻接矩阵
+        private int[][] adjacencyMatrix = new int[vexnum][vexnum];
+
+
+        // 初始化图
+        private void initMap() {
+            for (int i = 0; i < adjacencyMatrix.length; i++) {    //遍历行
+                for (int j = 0; j < adjacencyMatrix[i].length; j++) {
+                    // 初始化无边的值
+                    adjacencyMatrix[i][j] = INFINITY;
+                    // System.out.println("map["+i+"]["+j+"]="+map[i][j]);
+                }
+            }
+        }
+
+        // 返回顶点u在图中的位置
+        private int locateVex(String[] vex, String u) {
+            for (int i = 0; i < vex.length; i++) {
+                if (u.equals(vex[i])) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        // 默认测试顶点和边的权值
+        private void setStartEndWeight(String start, String end, int weight) {
+            //
+            int i = locateVex(vexs, start);
+            int j = locateVex(vexs, end);
+            adjacencyMatrix[i][j] = weight;
+        }
+
+        // 建立边和权值
+        private void defaultSet() {
+            setStartEndWeight("v0", "v5", 100);
+            setStartEndWeight("v0", "v4", 30);
+            setStartEndWeight("v0", "v2", 10);
+            setStartEndWeight("v1", "v2", 5);
+            setStartEndWeight("v2", "v3", 50);
+            setStartEndWeight("v3", "v5", 10);
+            setStartEndWeight("v4", "v3", 20);
+            setStartEndWeight("v4", "v5", 60);
+        }
+
+        // 建立边和权值
+        private void manualSet() {
+            for (int k = 0; k < arcnum; k++) {
+                // 输入边的起点和终点及权值
+                Scanner scan = new Scanner(System.in);
+                System.out.println("请输入边的起始点");
+                String start = String.valueOf(scan.nextLine());
+                System.out.println("请输入边的终止点");
+                String end = String.valueOf(scan.nextLine());
+                // 设置权值
+                System.out.println("请输入边的权值");
+                int weight = Integer.parseInt(scan.nextLine());
+                setStartEndWeight(start, end, weight);
+            }
+        }
+
+        // 出发点
+        public void dijkstra(String begin) {
+            // 起点的位置
+            int start = locateVex(vexs, begin);
+            // 最短路径数组
+            int[][] minPath = new int[vexnum][vexnum];
+            // 最短距离数组,起点到其他各个点的距离
+            int[] minDistance = new int[vexnum];
+            // 存储是否处理过
+            boolean[] finalarr = new boolean[vexnum];
+            for (int i = 0; i < vexnum; i++) {
+                // 默认到达其他距离为直接距离
+                minDistance[i] = adjacencyMatrix[start][i];
+                // 默认到其他节点没有处理过
+                finalarr[i] = false;
+                for (int j = 0; j < vexnum; j++) {
+                    // 默认没有路径，代表从起点开始到其他点，如横坐标代表经过的点，
+                    // 纵坐标代表目的点，中间不需要重复走，则到其他个点最多走除了起点和终点的其他所有点
+                    minPath[i][j] = -1;
+                }
+                if (minDistance[i] != -1) {
+                    // 有直接路径,第一步要经过始发点
+                    minPath[i][0] = start;
+                    // 第二步直接目的点
+                    minPath[i][1] = i;
+                }
+                // 到达自己原地
+                if (start == i) {
+                    // 自己到自己距离为0
+                    minDistance[i] = 0;
+                    finalarr[i] = true;
+                }
+            }
+            // 开始计算到达其他个点的距离
+            for (int j = 0; j < vexnum; j++) {
+                int v = -1;
+                int min = Integer.MAX_VALUE;
+                for (int w = 0; w < vexnum; w++) {
+                    if (!finalarr[w] && minDistance[w] >= 0) {
+                        // 暂存
+                        if (v < 0 || minDistance[w] < min) {
+                            // 到w的最短距离
+                            min = minDistance[w];
+                            v = w;
+                        }
+                    }
+                }
+                if (v > -1) {
+                    finalarr[v] = true;
+                    for (int k = 0; k < vexnum; k++) {
+                        if (adjacencyMatrix[v][k] >= 0) { // 有连通
+                            if (minDistance[k] < 0
+                                    || minDistance[v] + adjacencyMatrix[v][k] < minDistance[k]) {
+                                minDistance[k] = minDistance[v] + adjacencyMatrix[v][k];
+                                for (int p = 0; p < vexnum; p++) {
+                                    // 插入最短路径
+                                    minPath[k][p] = minPath[v][p];
+                                    if (minPath[k][p] == -1) {
+                                        minPath[k][p] = k;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 输出最短路径
+            System.out.println("最短路径数组如下");
+            for (int i = 0; i < vexnum; i++) {
+                for (int j = 0; j < vexnum; j++) {
+                    System.out.print(minPath[i][j] + ",");
+                }
+                System.out.println("");
+            }
+            //
+            System.out.println(begin + "到各顶点的最短路径及长度为：");
+            for (int i = 0; i < vexnum; i++) {
+                if (i != 0 && minDistance[i] != INFINITY) {
+                    System.out.print(vexs[0] + "-" + vexs[i] + "的最短路径长度为：" + minDistance[i]);
+                    System.out.print("最短路径为：");
+                    for (int j = 0; j < vexnum; j++) {
+                        if (minPath[i][j] > INFINITY) {
+                            System.out.print(vexs[minPath[i][j]] + " ");
+                        }
+                    }
+                    System.out.println("");
+                } else {
+                    System.out.println(vexs[0] + "-" + vexs[i] + "：不可达");
+                }
+            }
+        }
+
+    }
+}
